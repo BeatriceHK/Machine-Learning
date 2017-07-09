@@ -24,9 +24,13 @@ Theta2 = reshape(nn_params((1 + (hidden_layer_size * (input_layer_size + 1))):en
 
 % Setup some useful variables
 m = size(X, 1);
+
+% reshape Y into a m x 10 matrix
+matY = zeros(m,num_labels);
+
          
 % You need to return the following variables correctly 
-J = 0;
+% J = 0;
 Theta1_grad = zeros(size(Theta1));
 Theta2_grad = zeros(size(Theta2));
 
@@ -62,27 +66,65 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
+% first layer
+X1 = [ones(m, 1) X];
+
+% second layer
+a2 = sigmoid(X1*(Theta1'));
+a21 = [ones(m,1) a2];
+
+% third layer
+hx = sigmoid(a21*(Theta2'));
+
+% calculate the cost function
+left=(log(hx))';
+right=(log(1-hx))';
+num=zeros(m,1);
+
+for i=1:m;
+    matY(i,y(i)) = 1;
+    num(i,1) =-(matY(i,:)*(left(:,i)))-((1-matY(i,:))*(right(:,i))); 
+end
+
+cost1 = Theta1;
+for i=2:size(Theta1, 2);
+    cost1(:,i)=Theta1(:,i).^2;
+end
+
+cost2=Theta2;
+for i=2:size(Theta2,2);
+    cost2(:,i)=Theta2(:,i).^2;
+end
+
+reg = (sum(sum(cost1(:,2:end)))+sum(sum(cost2(:,2:end))))*lambda/(2*m);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+J = sum(num)/m+reg;
 
 % -------------------------------------------------------------
 
 % =========================================================================
+
+% backprop for one observation
+Delta1 = zeros(hidden_layer_size+1, size(X,2)+1);
+Delta2 = zeros(num_labels, hidden_layer_size+1);
+
+for i=1:m;
+delta3 = (hx(i,:) - matY(i,:))';
+
+sig=a21.*(1-a21);
+
+delta2 = ((Theta2')*delta3).*(sig(i,:)');
+
+Delta2=Delta2+delta3*a21(i,:);
+
+delta1 = delta2*X1(i,:);
+
+Delta1 = Delta1 + delta1;
+end
+
+Theta1_grad = Delta1(2:end,:)/m;
+Theta2_grad = Delta2/m;
 
 % Unroll gradients
 grad = [Theta1_grad(:) ; Theta2_grad(:)];
