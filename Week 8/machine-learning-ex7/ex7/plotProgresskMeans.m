@@ -21,7 +21,7 @@ for j=1:size(centroids,1)
 end
 
 % Title
-title(sprintf('Iteration number %d', i))
+%title(sprintf('Iteration number %d', i))
 
 end
 
