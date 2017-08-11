@@ -14,10 +14,10 @@ Theta = reshape(params(num_movies*num_features+1:end), num_users, num_features);
 mat = zeros(num_movies,num_users);
 for i=1:num_movies;
         for j=1:num_users;
-            mat(i,j) = sum(X(i,:).*Theta(j,:));
+            mat(:,i) = X*(Theta(i,:))';
         end
 end
-J = sum(sum(((mat.*R)-Y).^2))/2;
+J = sum(sum((mat-(Y.*R)).^2))/2;
 X_grad = zeros(size(X));
 Theta_grad = zeros(size(Theta));
 
