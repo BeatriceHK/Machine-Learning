@@ -17,7 +17,7 @@ for i=1:num_movies;
             mat(i,j) = sum(X(i,:).*Theta(j,:));
         end
 end
-J = sum(sum(((mat.*R)-Y).^2))/2;
+J = sum(sum(((mat.*R)-Y).^2))/2+lambda/2*sum(sum(Theta.^2))+lambda/2*sum(sum(X.^2));
 X_grad = zeros(size(X));
 Theta_grad = zeros(size(Theta));
 
@@ -52,23 +52,21 @@ idx = find(R(i, :)==1);
 Theta_tmp = Theta(idx, :);
 Y_tmp = Y(i, idx);
 
-X_grad(i,:)=((X(i,:)*Theta_tmp'-Y_tmp)*Theta_tmp)';
+X_grad(i,:)=((X(i,:)*Theta_tmp'-Y_tmp)*Theta_tmp)' + (lambda*X(i,:))';
 
 end
 
-for i=1:num_users,
+for j=1:num_users,
+% movies that have been rated by user j
+idx = find(R(:, j)==1);
 
-    
-Theta_grad(i,:)=((X(i,:)*Theta_tmp'-Y_tmp)*X_tmp)';
+% the set of movies that have been rated by user j
+Theta_tmp = Theta(j,:); % theta parameter vector for the jth user
+Y_tmp = Y(idx, j);
+
+
+Theta_grad(j,:)=((X(idx,:)*(Theta_tmp'))-Y_tmp)'  * X(idx,:) + lambda.*Theta_tmp;
 end
-
-
-
-
-
-
-
-
 
 
 % =============================================================
