@@ -44,11 +44,23 @@ Theta_grad = zeros(size(Theta));
 %                     partial derivatives w.r.t. to each element of Theta
 %
 
+for i=1:num_movies,
+% users that have rated movie i
+idx = find(R(i, :)==1);
 
+% the set of users that have rated the ith movie
+Theta_tmp = Theta(idx, :);
+Y_tmp = Y(i, idx);
 
+X_grad(i,:)=((X(i,:)*Theta_tmp'-Y_tmp)*Theta_tmp)';
 
+end
 
+for i=1:num_users,
 
+    
+Theta_grad(i,:)=((X(i,:)*Theta_tmp'-Y_tmp)*X_tmp)';
+end
 
 
 
